@@ -25,7 +25,9 @@ class RandomWords extends StatefulWidget {
 class _RandomWordsState extends State<RandomWords> {
   final _suggestions = <WordPair>[];
   final _saved = <WordPair>{};
-  final _biggerFont = const TextStyle(fontSize: 18);
+  final _titleFont = const TextStyle(fontSize: 16, color: Color.fromRGBO(66, 66, 66, 1));
+  final _subtitleFont = const TextStyle(fontSize: 12, color: Color.fromRGBO(179, 179, 179, 1));
+
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +49,12 @@ class _RandomWordsState extends State<RandomWords> {
           final tiles = _saved.map((WordPair pair) {
               return ListTile(
                 title: Text(
-                  pair.asPascalCase,
-                  style: _biggerFont,
+                  pair.first,
+                  style: _titleFont,
+                ),
+                subtitle: Text(
+                  pair.second,
+                  style: _subtitleFont,
                 ),
               );
             },
@@ -71,10 +77,23 @@ class _RandomWordsState extends State<RandomWords> {
 
   Widget _buildRow(WordPair pair) {
     final alreadySaved = _saved.contains(pair);
+
     return ListTile(
+      leading: Container(
+        child: Icon(
+          alreadySaved ? Icons.favorite : Icons.favorite_border,
+          color: alreadySaved ? Colors.red : null,
+        ),
+        alignment: Alignment.centerLeft,
+        width: 16,
+      ),
       title: Text(
-        pair.asPascalCase,
-        style: _biggerFont,
+        pair.first,
+        style: _titleFont,
+      ),
+      subtitle: Text(
+        pair.second,
+        style: _subtitleFont
       ),
       trailing: Icon(
         alreadySaved ? Icons.favorite : Icons.favorite_border,
@@ -94,7 +113,6 @@ class _RandomWordsState extends State<RandomWords> {
 
   Widget _buildSuggestions() {
     return ListView.builder(
-        padding: const EdgeInsets.all(16),
         itemBuilder: (BuildContext _context, int i) {
           if (i.isOdd) {
             return Divider();
