@@ -1,5 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
+
+import 'list-item.dart';
 
 void main() => runApp(MyApp());
 
@@ -25,9 +29,6 @@ class RandomWords extends StatefulWidget {
 class _RandomWordsState extends State<RandomWords> {
   final _suggestions = <WordPair>[];
   final _saved = <WordPair>{};
-  final _titleFont = const TextStyle(fontSize: 16, color: Color.fromRGBO(66, 66, 66, 1));
-  final _subtitleFont = const TextStyle(fontSize: 12, color: Color.fromRGBO(179, 179, 179, 1));
-
 
   @override
   Widget build(BuildContext context) {
@@ -47,16 +48,7 @@ class _RandomWordsState extends State<RandomWords> {
       MaterialPageRoute<void>(
         builder: (BuildContext context) {
           final tiles = _saved.map((WordPair pair) {
-              return ListTile(
-                title: Text(
-                  pair.first,
-                  style: _titleFont,
-                ),
-                subtitle: Text(
-                  pair.second,
-                  style: _subtitleFont,
-                ),
-              );
+              return ListItem(title: pair.first, subtitle: pair.second, leftIcon: null, rightIcon: null);
             },
           );
           final divided = ListTile.divideTiles(
@@ -76,39 +68,43 @@ class _RandomWordsState extends State<RandomWords> {
   }
 
   Widget _buildRow(WordPair pair) {
+    Random r = new Random();
+    double falseProbability = .5;
+    bool leftRandom = r.nextDouble() > falseProbability;
+    bool rightRandom = r.nextDouble() > falseProbability;
+
     final alreadySaved = _saved.contains(pair);
 
-    return ListTile(
-      leading: Container(
-        child: Icon(
-          alreadySaved ? Icons.favorite : Icons.favorite_border,
-          color: alreadySaved ? Colors.red : null,
-        ),
-        alignment: Alignment.centerLeft,
-        width: 16,
-      ),
-      title: Text(
-        pair.first,
-        style: _titleFont,
-      ),
-      subtitle: Text(
-        pair.second,
-        style: _subtitleFont
-      ),
-      trailing: Icon(
-        alreadySaved ? Icons.favorite : Icons.favorite_border,
-        color: alreadySaved ? Colors.red : null,
-      ),
-      onTap: () {
-        setState(() {
-          if (alreadySaved) {
-            _saved.remove(pair);
-          } else {
-            _saved.add(pair);
-          }
-        });
-      },
+    Icon leftIcon = leftRandom ? Icon(
+      alreadySaved ? Icons.favorite : Icons.favorite_border,
+      color: alreadySaved ? Colors.red : null,
+    ) : null;
+    Icon rightIcon = rightRandom ? Icon(
+      alreadySaved ? Icons.favorite : Icons.favorite_border,
+      color: alreadySaved ? Colors.red : null,
+    ) : null;
+
+    return new ListItem(
+        title: pair.first,
+        subtitle: pair.second,
+        leftIcon: leftIcon,
+        rightIcon: rightIcon,
+        onTap: (title, subtitle) => this._handleItemClick(title, subtitle)
     );
+  }
+
+  void _handleItemClick(String title, String subtitle) {
+    print('abc');
+    final pair = new WordPair(title, subtitle);
+    final alreadySaved = _saved.contains(pair);
+
+    setState(() {
+      if (alreadySaved) {
+        _saved.remove(pair);
+      } else {
+        _saved.add(pair);
+      }
+    });
   }
 
   Widget _buildSuggestions() {
